@@ -1,5 +1,5 @@
 package lib;
-
+/*
 import (
 	"io";
 	"fmt";
@@ -7,7 +7,7 @@ import (
 	"net/http";
 )
 
-func HttpServer() {
+func GoHttpServer() {
 	fmt.Println("\n\n ## The following content is exploring Go Http Server ## \n");
 	initServer();
 }
@@ -25,3 +25,4 @@ func homeHandler(w http.ResponseWriter, req *http.Request) {
 func helloHandler(w http.ResponseWriter, req *http.Request) {
 	io.WriteString(w, "Hello, world!\n");
 }
+*/
