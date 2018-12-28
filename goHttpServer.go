@@ -1,10 +1,9 @@
 package main;
 
 import (
-	"github.com/fellippemendonca/goHttpServer/lib"
+	"github.com/fellippemendonca/goHttpServer/app"
 )
 
 func main() {
-	lib.GorillaHttpServer();
-	//lib.GoHttpServer();
+	app.Init();
 }
