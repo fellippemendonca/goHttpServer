@@ -1,30 +1,36 @@
-package middleware;
+package middleware
 
 import (
 	"fmt"
-	"log"
-	"net/http"
+	"github.com/fellippemendonca/goHttpServer/lib/logger"
+	"github.com/fellippemendonca/goHttpServer/lib/auth"
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 func Init(router *mux.Router) {
-	fmt.Println("\n\n ## INITIALYZING MIDDLEWARE ## \n");
-	router.Use(middleware);
+	fmt.Println("[OK] -- INITIALIZING MIDDLEWARE")
+	router.Use(log)
+	router.Use(authenticate)
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
-		log.Println("URI:", r.RequestURI, "Headers:", r.Header)
-		//fmt.Fprintf(w, "No no no. Wrong Path.");
-	});
+	})
 }
 
-func middleware(next http.Handler) http.Handler {
+func authenticate(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("x-auth-token") != "admin" {
+		token := r.Header.Get("x-auth-token")
+		if auth.Check(token) != true {
 			w.WriteHeader(http.StatusUnauthorized)
-			//fmt.Fprintf(w, "No no no. Wrong Pass.");
 			return
 		}
-		log.Println("URI:", r.RequestURI, "Headers:", r.Header)
-		next.ServeHTTP(w, r)
+		h.ServeHTTP(w, r)
+	})
+}
+
+func log(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("URI:", r.RequestURI, ", Headers:", r.Header.Get("x-auth-token"))
+	  	h.ServeHTTP(w, r)
 	})
 }

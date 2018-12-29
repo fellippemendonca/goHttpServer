@@ -1,4 +1,4 @@
-package v2;
+package v2
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 )
 
 func Init(router *mux.Router) {
-	fmt.Println("\n\n ## INITIALYZING V2 CONTROLLERS ## \n");
-	usersRouter := router.PathPrefix("/users").Subrouter();
-	InitUsers(usersRouter);
+	fmt.Println("[OK] -- INITIALIZING V2 CONTROLLERS")
+	usersRouter := router.PathPrefix("/users").Subrouter()
+	InitUsers(usersRouter)
 }

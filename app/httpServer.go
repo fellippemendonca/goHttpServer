@@ -1,13 +1,13 @@
-package app;
+package app
 
 import (
 	"fmt"
-	"net/http"
 	"github.com/fellippemendonca/goHttpServer/app/router"
+	"net/http"
 )
 
 func Init() {
-	fmt.Println("\n\n ## INITIALYZING HTTP SERVER ## \n");
-	router := router.Init();
-	http.ListenAndServe(":8080", router);
+	fmt.Println("[OK] -- INITIALIZING HTTP SERVER")
+	router := router.Init()
+	http.ListenAndServe(":8080", router)
 }
