@@ -1,9 +1,0 @@
-
-2018/12/29 20:46:07 [server init]
-2018/12/29 20:47:55 [server init]
-2018/12/29 20:53:05 [URI: /v2/users/John , Headers: admin]
-2018/12/29 20:53:10 [URI: /v1/users/John , Headers: admin]
-2018/12/29 20:54:48 [URI: /api/v1/users/John , Headers: admin]
-2018/12/29 21:05:03 [URI: /api/v1/users/John , Headers: admin]
-2018/12/29 21:31:49 [URI: /api/v1/users/John , Headers: admin]
-2018/12/29 21:32:15 [URI: /api/v1/users/John , Headers: admin]

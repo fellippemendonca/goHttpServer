@@ -10,10 +10,10 @@ import (
 
 func Init(router *gin.Engine) {
 	fmt.Println("[OK] -- INITIALIZING MIDDLEWARE")
-	router.Use(globalMiddleware("testString"))
-	//router.Use(log)
-	//authorized := router.Group("/")
-	//authorized.Use(authenticate)
+	//router.Use(globalMiddleware("testString"))
+	router.Use(log)
+	authorized := router.Group("/")
+	authorized.Use(authenticate)
 	/*
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
@@ -43,7 +43,7 @@ func globalMiddleware(params string) gin.HandlerFunc {
     }
 }
 
-/*
+/**/
 func authenticate(h gin.HandlerFunc) gin.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("x-auth-token")
@@ -61,4 +61,3 @@ func log(h gin.HandlerFunc) gin.HandlerFunc {
 	  	h.ServeHTTP(w, r)
 	})
 }
-*/

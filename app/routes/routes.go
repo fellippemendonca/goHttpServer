@@ -12,8 +12,8 @@ func Init() *gin.Engine {
 	fmt.Println("[OK] -- INITIALIZING ROUTES")
 	router := gin.Default()
 	fmt.Println(reflect.TypeOf(router))
-	apiRouter := router.Group("/api")
 	middleware.Init(router)
+	apiRouter := router.Group("/api")
 	api.Init(apiRouter)
 	return router
 }
