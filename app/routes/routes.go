@@ -2,18 +2,18 @@ package routes
 
 import (
 	"fmt"
-	"github.com/fellippemendonca/goHttpServer/app/api"
+	//"github.com/fellippemendonca/goHttpServer/app/api"
 	"github.com/fellippemendonca/goHttpServer/app/middleware"
-	"github.com/gin-gonic/gin"
+	"net/http"
 	"reflect"
 )
 
-func Init() *gin.Engine {
+func Init() *http.ServeMux {
 	fmt.Println("[OK] -- INITIALIZING ROUTES")
-	router := gin.Default()
+	router := http.NewServeMux()
 	fmt.Println(reflect.TypeOf(router))
 	middleware.Init(router)
-	apiRouter := router.Group("/api")
-	api.Init(apiRouter)
+	//apiRouter := router.Group("/api")
+	//api.Init(apiRouter)
 	return router
 }

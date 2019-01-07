@@ -2,62 +2,58 @@ package middleware
 
 import (
 	"fmt"
-	//"github.com/fellippemendonca/goHttpServer/lib/logger"
-	//"github.com/fellippemendonca/goHttpServer/lib/auth"
-	"github.com/gin-gonic/gin"
-	//"net/http"
+	"github.com/fellippemendonca/goHttpServer/lib/logger"
+	"github.com/fellippemendonca/goHttpServer/lib/auth"
+	"net/http"
 )
 
-func Init(router *gin.Engine) {
-	fmt.Println("[OK] -- INITIALIZING MIDDLEWARE")
-	//router.Use(globalMiddleware("testString"))
-	router.Use(log)
-	authorized := router.Group("/")
-	authorized.Use(authenticate)
-	/*
-	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
+func middlewareOne(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//log.Println("Executing middlewareOne")
+		next.ServeHTTP(w, r)
+		//log.Println("Executing middlewareOne again")
 	})
-	*/
+}
+  
+func middlewareTwo(next http.Handler) http.Handler {	
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//log.Println("Executing middlewareTwo")
+		if r.URL.Path != "/" {
+			return
+		}
+		next.ServeHTTP(w, r)
+		//log.Println("Executing middlewareTwo again")
+	})
 }
 
-func globalMiddleware(params string) gin.HandlerFunc {
-    // <---
-	// This is part one
-	fmt.Println("GLOBAL MIDDLEWARE ... 1")
-    // --->
-    // The follow code is an example
-    //if err := check(params); err != nil {
-        //panic(err)
-    //}
-
-    return func(c *gin.Context) {
-        // <---
-		// This is part two
-		fmt.Println("GLOBAL MIDDLEWARE ... 2")
-        // --->
-        // The follow code is an example
-        c.Set("TestVar", params)
-		c.Next()
-		fmt.Println("GLOBAL MIDDLEWARE ... 3")
-    }
+func final(w http.ResponseWriter, r *http.Request) {
+	//log.Println("Executing finalHandler")
+	w.Write([]byte("OK"))
 }
 
-/**/
-func authenticate(h gin.HandlerFunc) gin.HandlerFunc {
+func log(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("URI:", r.RequestURI, ", Headers:", r.Header.Get("x-auth-token"))
+	  	next.ServeHTTP(w, r)
+	})
+}
+
+func authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("x-auth-token")
 		if auth.Check(token) != true {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		h.ServeHTTP(w, r)
+		next.ServeHTTP(w, r)
 	})
 }
 
-func log(h gin.HandlerFunc) gin.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("URI:", r.RequestURI, ", Headers:", r.Header.Get("x-auth-token"))
-	  	h.ServeHTTP(w, r)
-	})
+func Init(router *http.ServeMux) {
+	fmt.Println("[OK] -- INITIALIZING MIDDLEWARE")
+	//router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	//	w.WriteHeader(http.StatusNotFound)
+	//})
+	finalHandler := http.HandlerFunc(final)
+	router.Handle("/", log(authenticate(finalHandler)))
 }
