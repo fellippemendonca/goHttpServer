@@ -7,25 +7,6 @@ import (
 	"net/http"
 )
 
-func middlewareOne(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//log.Println("Executing middlewareOne")
-		next.ServeHTTP(w, r)
-		//log.Println("Executing middlewareOne again")
-	})
-}
-  
-func middlewareTwo(next http.Handler) http.Handler {	
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//log.Println("Executing middlewareTwo")
-		if r.URL.Path != "/" {
-			return
-		}
-		next.ServeHTTP(w, r)
-		//log.Println("Executing middlewareTwo again")
-	})
-}
-
 func final(w http.ResponseWriter, r *http.Request) {
 	//log.Println("Executing finalHandler")
 	w.Write([]byte("OK"))
@@ -49,11 +30,8 @@ func authenticate(next http.Handler) http.Handler {
 	})
 }
 
-func Init(router *http.ServeMux) {
+func Init(next http.Handler) http.Handler {
 	fmt.Println("[OK] -- INITIALIZING MIDDLEWARE")
-	//router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	//	w.WriteHeader(http.StatusNotFound)
-	//})
-	finalHandler := http.HandlerFunc(final)
-	router.Handle("/", log(authenticate(finalHandler)))
+	return log(authenticate(next))
+	//router.Handle("/", log(authenticate(next)))
 }
