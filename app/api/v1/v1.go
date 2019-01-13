@@ -7,7 +7,7 @@ import (
 )
 
 func Init(p *router.Path) {
-	fmt.Println("[OK] -- INITIALIZING V2 CONTROLLERS")
+	fmt.Println("[OK] -- INITIALIZING V1 CONTROLLERS")
 	usersRouter := p.Add("/users")
 	InitUsers(usersRouter)
 }

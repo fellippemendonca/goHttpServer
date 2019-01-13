@@ -5,87 +5,41 @@ import (
 	"net/http"
 )
 
-func (p *Path) Post(u string, h http.Handler) {
-	path := p.Add(u)
-	uri := path.Resolve()
-	fmt.Println(uri)
-	path.router.mux.Handle(uri, h)
-}
+type MethodHandler struct{}
 
-func (p *Path) Get(u string, h http.Handler) {
-	path := p.Add(u)
-	uri := path.Resolve()
-	fmt.Println(uri)
-	path.router.mux.Handle(uri, h)
-}
-
-func (p *Path) Put(u string, h http.Handler) {
-	path := p.Add(u)
-	uri := path.Resolve()
-	fmt.Println(uri)
-	path.router.mux.Handle(uri, h)
-}
-
-func (p *Path) Delete(u string, h http.Handler) {
-	path := p.Add(u)
-	uri := path.Resolve()
-	fmt.Println(uri)
-	path.router.mux.Handle(uri, h)
-}
-
-/*
-type controllerInfo struct {
-	regex          *regexp.Regexp
-	params         map[int]string
-	controllerType reflect.Type
-}
-
-type ControllerRegistor struct {
-	routers     []*controllerInfo
-	Application *App
-}
-
-func (p *ControllerRegistor) Add(pattern string, c ControllerInterface) {
-	parts := strings.Split(pattern, "/")
-
-	j := 0
-	params := make(map[int]string)
-	for i, part := range parts {
-		if strings.HasPrefix(part, ":") {
-			expr := "([^/]+)"
-
-			//a user may choose to override the default expression
-			// similar to expressjs: ‘/user/:id([0-9]+)’
-
-			if index := strings.Index(part, "("); index != -1 {
-				expr = part[index:]
-				part = part[:index]
-			}
-			params[j] = part
-			parts[i] = expr
-			j++
-		}
-	}
-
-	//recreate the url pattern, with parameters replaced
-	//by regular expressions. Then compile the regex.
-
-	pattern = strings.Join(parts, "/")
-	regex, regexErr := regexp.Compile(pattern)
-	if regexErr != nil {
-
-		//TODO add error handling here to avoid panic
-		panic(regexErr)
+func (*MethodHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.Method)
+	if r.Method == "GET" {
+		fmt.Fprintf(w, "Method Allowed")
 		return
 	}
-
-	//now create the Route
-	t := reflect.Indirect(reflect.ValueOf(c)).Type()
-	route := &controllerInfo{}
-	route.regex = regex
-	route.params = params
-	route.controllerType = t
-
-	p.routers = append(p.routers, route)
+	fmt.Fprintf(w, "Method Not Allowed")
+	return
+	//fmt.Println("path", r.URL.Path)
+	//query := r.URL.Query()
+	//fmt.Println("query", query.Get("name"))
+	//fmt.Fprintf(w, "Welcome to the users!")
 }
-*/
+
+func get(f http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.Method)
+		if r.Method == "GET" {
+			fmt.Println("Method Allowed")
+			f(w, r)
+			return
+		}
+		fmt.Println("Method Not Allowed")
+		return
+	}
+}
+
+func (p *Path) Get(f http.HandlerFunc) {
+	h := &MethodHandler{}
+	uri, params := p.GetPath()
+	fmt.Println(uri, params)
+	//p.router.mux.HandleFunc(uri, get(f))
+	p.router.mux.Handle(uri, h)
+}
+
+/**/

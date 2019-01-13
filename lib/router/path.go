@@ -1,10 +1,15 @@
 package router
 
+import (
+	"strings"
+)
+
 type Path struct {
 	uri    string
 	head   *Path
 	router *Router
 	paths  []*Path
+	params map[int]string
 }
 
 func (p *Path) Add(u string) *Path {
@@ -16,37 +21,21 @@ func (p *Path) Add(u string) *Path {
 	return path
 }
 
-func (p *Path) Resolve() string {
+func (p *Path) GetUri() string {
 	if p.head != nil {
-		return p.head.Resolve() + "" + p.uri
+		return p.head.GetUri() + "" + p.uri
 	}
 	return p.uri
 }
 
-/*
-type controllerInfo struct {
-	regex          *regexp.Regexp
-	params         map[int]string
-	controllerType reflect.Type
-}
-
-type ControllerRegistor struct {
-	routers     []*controllerInfo
-	Application *App
-}
-
-func (p *ControllerRegistor) Add(pattern string, c ControllerInterface) {
-	parts := strings.Split(pattern, "/")
-
+func (p *Path) GetPath() (string, map[int]string) {
+	uri := p.GetUri()
+	parts := strings.Split(uri, "/")
 	j := 0
 	params := make(map[int]string)
 	for i, part := range parts {
 		if strings.HasPrefix(part, ":") {
 			expr := "([^/]+)"
-
-			//a user may choose to override the default expression
-			// similar to expressjs: ‘/user/:id([0-9]+)’
-
 			if index := strings.Index(part, "("); index != -1 {
 				expr = part[index:]
 				part = part[:index]
@@ -56,26 +45,13 @@ func (p *ControllerRegistor) Add(pattern string, c ControllerInterface) {
 			j++
 		}
 	}
-
-	//recreate the url pattern, with parameters replaced
-	//by regular expressions. Then compile the regex.
-
-	pattern = strings.Join(parts, "/")
-	regex, regexErr := regexp.Compile(pattern)
-	if regexErr != nil {
-
-		//TODO add error handling here to avoid panic
-		panic(regexErr)
-		return
-	}
-
-	//now create the Route
-	t := reflect.Indirect(reflect.ValueOf(c)).Type()
-	route := &controllerInfo{}
-	route.regex = regex
-	route.params = params
-	route.controllerType = t
-
-	p.routers = append(p.routers, route)
+	uri = strings.Join(parts, "/")
+	return uri, params
+	/*
+		regex, regexErr := regexp.Compile(uri)
+		if regexErr != nil {
+			panic(regexErr)
+			return nil
+		}
+	*/
 }
-*/
