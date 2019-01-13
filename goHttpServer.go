@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/fellippemendonca/goHttpServer/app"
-)
+import "github.com/fellippemendonca/goHttpServer/app"
 
 func main() {
-	app.Init()
+	app.Server()
 }

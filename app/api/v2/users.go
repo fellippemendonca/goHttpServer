@@ -2,48 +2,44 @@ package v2
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/fellippemendonca/goHttpServer/lib/router"
 )
 
-func InitUsers(router *gin.RouterGroup) {
+func InitUsers(p *router.Path) {
 	fmt.Println("[OK] -- INITIALIZING USERS CONTROLLER")
-	postUser(router)
-	getUser(router)
-	putUser(router)
-	deleteUser(router)
+	getUsers(p)
+	getUserById(p)
+	//postUser(p)
+	//putUser(p)
+	//deleteUser(p)
 }
 
-func postUser(router *gin.RouterGroup) {
-	router.POST("/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		c.String(http.StatusOK, "Hello %s", id)
-	})
+type usersHandler struct{}
+
+func (usersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome to the users!")
 }
 
-func getUser(router *gin.RouterGroup) {
-	router.GET("/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		lastname := c.Query("lastname")
-		firstname := c.DefaultQuery("firstname", "Guest")
-		c.String(http.StatusOK, "Hello %s %s %s", id, firstname, lastname)
-	})
+func getUsers(p *router.Path) {
+	p.Get("/", usersHandler{})
 }
 
-func putUser(router *gin.RouterGroup) {
-	router.PUT("/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		lastname := c.Query("lastname")
-		firstname := c.DefaultQuery("firstname", "Guest")
-		c.String(http.StatusOK, "Hello %s %s %s", id, firstname, lastname)
-	})
+func getUserById(p *router.Path) {
+	p.Get("/:id", usersHandler{})
 }
 
-func deleteUser(router *gin.RouterGroup) {
-	router.DELETE("/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		lastname := c.Query("lastname")
-		firstname := c.DefaultQuery("firstname", "Guest")
-		c.String(http.StatusOK, "Hello %s %s %s", id, firstname, lastname)
-	})
+/*
+func postUser(p *router.Path) {
+	p.Post("/:id", usersHandler{})
 }
+
+func putUser(p *router.Path) {
+	p.Put("/:id", usersHandler{})
+}
+
+func deleteUser(p *router.Path) {
+	p.Delete("/:id", usersHandler{})
+}
+*/

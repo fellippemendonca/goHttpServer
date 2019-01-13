@@ -2,20 +2,16 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/fellippemendonca/goHttpServer/lib/logger"
-	"github.com/fellippemendonca/goHttpServer/lib/auth"
 	"net/http"
-)
 
-func final(w http.ResponseWriter, r *http.Request) {
-	//log.Println("Executing finalHandler")
-	w.Write([]byte("OK"))
-}
+	"github.com/fellippemendonca/goHttpServer/lib/auth"
+	"github.com/fellippemendonca/goHttpServer/lib/logger"
+)
 
 func log(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger.Info("URI:", r.RequestURI, ", Headers:", r.Header.Get("x-auth-token"))
-	  	next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r)
 	})
 }
 
@@ -30,8 +26,10 @@ func authenticate(next http.Handler) http.Handler {
 	})
 }
 
+// Middleware Initializer
 func Init(next http.Handler) http.Handler {
 	fmt.Println("[OK] -- INITIALIZING MIDDLEWARE")
-	return log(authenticate(next))
-	//router.Handle("/", log(authenticate(next)))
+	next = authenticate(next)
+	next = log(next)
+	return next
 }
