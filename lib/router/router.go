@@ -11,16 +11,14 @@ func Init() *Router {
 }
 
 type Router struct {
-	mux  *http.ServeMux
-	path *Path
+	mux *http.ServeMux
 }
 
 func (r *Router) Add(u string) *Path {
 	path := &Path{}
 	path.uri = u
 	path.head = nil
-	path.router = r
-	r.path = path
+	path.mux = r.mux
 	return path
 }
 

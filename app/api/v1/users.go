@@ -9,20 +9,11 @@ import (
 
 func InitUsers(p *router.Path) {
 	fmt.Println("[OK] -- INITIALIZING USERS CONTROLLER")
-	getUsers(p)
-	getUserById(p)
+	users(p)
 }
 
-func getUsers(p *router.Path) {
-	path := p.Add("/")
-	path.Get(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Get Users")
-	})
-}
-
-func getUserById(p *router.Path) {
-	path := p.Add("/:id")
-	path.Get(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Get Users By ID")
+func users(p *router.Path) {
+	p.Get("/:id", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("USERS"))
 	})
 }

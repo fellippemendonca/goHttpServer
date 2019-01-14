@@ -3,8 +3,8 @@ package routes
 import (
 	"fmt"
 	"net/http"
-	"regexp"
-	//"github.com/fellippemendonca/goHttpServer/app/api"
+
+	"github.com/fellippemendonca/goHttpServer/app/api"
 	"github.com/fellippemendonca/goHttpServer/lib/router"
 )
 
@@ -14,7 +14,7 @@ func Init() *http.ServeMux {
 	r := router.Init()
 	rootPath := r.Add("/")
 	apiPath := rootPath.Add("api")
-	middleware.Init(rootPath)
+	//middleware.Init(rootPath)
 	api.Init(apiPath)
 	return r.GetMux()
 }

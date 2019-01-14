@@ -1,66 +1,81 @@
 package router
 
 import (
+	"fmt"
+	"net/http"
+	"regexp"
 	"strings"
 )
 
 type Path struct {
-	uri    string
-	head   *Path
-	router *Router
-	paths  []*Path
-	params map[int]string
+	uri   string
+	head  *Path
+	mux   *http.ServeMux
+	route string
+	regex *regexp.Regexp
 }
 
 func (p *Path) Add(u string) *Path {
 	path := &Path{}
 	path.uri = u
 	path.head = p
-	path.router = p.router
-	p.paths = append(p.paths, path)
+	path.mux = p.mux
 	return path
 }
 
-func (p *Path) GetUri() string {
+func (p *Path) resolvePath() string {
 	if p.head != nil {
-		return p.head.GetUri() + "" + p.uri
+		return p.head.resolvePath() + "" + p.uri
 	}
 	return p.uri
 }
 
-func (p *Path) Resolve() (string, map[int]string) {
-	uri := p.GetUri()
-	parts := strings.Split(uri, "/")
+func generateRegex(route string) *regexp.Regexp {
+	parts := strings.Split(route, "/")
 
-    j := 0
-    params := make(map[int]string)
-    for i, part := range parts {
-        if strings.HasPrefix(part, ":") {
-            expr := "([^/]+)"
+	j := 0
+	params := make(map[int]string)
+	for i, part := range parts {
+		if strings.HasPrefix(part, ":") {
+			expr := "([^/]+)"
 
-            //a user may choose to override the default expression
-            // similar to expressjs: ‘/user/:id([0-9]+)’
+			//a user may choose to override the default expression
+			// similar to expressjs: ‘/user/:id([0-9]+)’
 
-            if index := strings.Index(part, "("); index != -1 {
-                expr = part[index:]
-                part = part[:index]
-            }
-            params[j] = part
-            parts[i] = expr
-            j++
-        }
-    }
+			if index := strings.Index(part, "("); index != -1 {
+				expr = part[index:]
+				part = part[:index]
+			}
+			params[j] = part
+			parts[i] = expr
+			j++
+		}
+	}
 
-    //recreate the url uri, with parameters replaced
-    //by regular expressions. Then compile the regex.
+	//recreate the url uri, with parameters replaced
+	//by regular expressions. Then compile the regex.
 
-    uri = strings.Join(parts, "/")
-    //regex, regexErr := regexp.Compile(uri)
-    //if regexErr != nil {
+	route = strings.Join(parts, "/")
+	regex, regexErr := regexp.Compile(route)
+	if regexErr != nil {
 
-        //TODO add error handling here to avoid panic
-        //panic(regexErr)
-        //return uri, params
-    //}
-	return uri, params
+		//TODO add error handling here to avoid panic
+		panic(regexErr)
+	}
+	return regex
+}
+
+func (p *Path) Get(s string, next http.HandlerFunc) {
+	path := p.resolvePath()
+	route := generateRegex(path + "" + s)
+	fmt.Println(path)
+	fmt.Println(route)
+	p.mux.HandleFunc(path+""+s, func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case route.MatchString(r.URL.Path):
+			next(w, r)
+		default:
+			w.Write([]byte("Unknown Pattern"))
+		}
+	})
 }
