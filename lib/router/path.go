@@ -28,30 +28,39 @@ func (p *Path) GetUri() string {
 	return p.uri
 }
 
-func (p *Path) GetPath() (string, map[int]string) {
+func (p *Path) Resolve() (string, map[int]string) {
 	uri := p.GetUri()
 	parts := strings.Split(uri, "/")
-	j := 0
-	params := make(map[int]string)
-	for i, part := range parts {
-		if strings.HasPrefix(part, ":") {
-			expr := "([^/]+)"
-			if index := strings.Index(part, "("); index != -1 {
-				expr = part[index:]
-				part = part[:index]
-			}
-			params[j] = part
-			parts[i] = expr
-			j++
-		}
-	}
-	uri = strings.Join(parts, "/")
+
+    j := 0
+    params := make(map[int]string)
+    for i, part := range parts {
+        if strings.HasPrefix(part, ":") {
+            expr := "([^/]+)"
+
+            //a user may choose to override the default expression
+            // similar to expressjs: ‘/user/:id([0-9]+)’
+
+            if index := strings.Index(part, "("); index != -1 {
+                expr = part[index:]
+                part = part[:index]
+            }
+            params[j] = part
+            parts[i] = expr
+            j++
+        }
+    }
+
+    //recreate the url uri, with parameters replaced
+    //by regular expressions. Then compile the regex.
+
+    uri = strings.Join(parts, "/")
+    //regex, regexErr := regexp.Compile(uri)
+    //if regexErr != nil {
+
+        //TODO add error handling here to avoid panic
+        //panic(regexErr)
+        //return uri, params
+    //}
 	return uri, params
-	/*
-		regex, regexErr := regexp.Compile(uri)
-		if regexErr != nil {
-			panic(regexErr)
-			return nil
-		}
-	*/
 }
