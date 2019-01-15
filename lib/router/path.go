@@ -70,7 +70,7 @@ func (p *Path) Get(s string, next http.HandlerFunc) {
 	route := generateRegex(path + "" + s)
 	fmt.Println(path)
 	fmt.Println(route)
-	p.mux.HandleFunc(path+""+s, func(w http.ResponseWriter, r *http.Request) {
+	p.mux.HandleFunc(path+"/", func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case route.MatchString(r.URL.Path):
 			next(w, r)
