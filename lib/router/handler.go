@@ -16,6 +16,22 @@ type Handler struct {
 	methods map[string]*Method
 }
 
+func (h *Handler) Get(path string, next http.HandlerFunc) {
+	h.addMethod("GET", path, next)
+}
+
+func (h *Handler) Put(path string, next http.HandlerFunc) {
+	h.addMethod("PUT", path, next)
+}
+
+func (h *Handler) Post(path string, next http.HandlerFunc) {
+	h.addMethod("POST", path, next)
+}
+
+func (h *Handler) Delete(path string, next http.HandlerFunc) {
+	h.addMethod("DELETE", path, next)
+}
+
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method + "" + r.URL.Path)
 	m := h.methods[r.Method]
@@ -33,35 +49,12 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	handler.ServeHTTP(w, r)
 }
 
-func (h *Handler) Get(s string, next http.HandlerFunc) {
-	method := "GET"
-	route := h.route + "" + s
-	m := h.methods[method]
+func (h *Handler) addMethod(name string, path string, next http.HandlerFunc) {
+	route := h.route + "" + path
+	m := h.methods[name]
 	if m == nil {
 		m = NewMethod()
 	}
 	m.Add(route, next)
-	h.methods[method] = m
-}
-
-func (h *Handler) Put(s string, next http.HandlerFunc) {
-	method := "PUT"
-	route := h.route + "" + s
-	m := h.methods[method]
-	if m == nil {
-		m = NewMethod()
-	}
-	m.Add(route, next)
-	h.methods[method] = m
-}
-
-func (h *Handler) Post(s string, next http.HandlerFunc) {
-	method := "POST"
-	route := h.route + "" + s
-	m := h.methods[method]
-	if m == nil {
-		m = NewMethod()
-	}
-	m.Add(route, next)
-	h.methods[method] = m
+	h.methods[name] = m
 }
