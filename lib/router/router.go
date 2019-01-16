@@ -18,6 +18,10 @@ func (r *Router) Add(u string) *Path {
 	return path
 }
 
+func (r *Router) GetMux() *http.ServeMux {
+	return r.mux
+}
+
 // Init Router
 func Init() *Router {
 	r := Router{}

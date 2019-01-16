@@ -1,69 +1,67 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
-	"regexp"
-	"strings"
 )
+
+func NewHandler() *Handler {
+	h := &Handler{}
+	h.methods = make(map[string]*Method)
+	return h
+}
 
 type Handler struct {
 	route   string
-	regex   *regexp.Regexp
-	methods map[*regexp.Regexp]http.Handler
-}
-
-func (h *Handler) Get(s string, next http.HandlerFunc) {
-	h.regex = generateRegex(h.route + "" + s)
-	h.methods[h.regex] = next
+	methods map[string]*Method
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	for regex, method := range h.methods {
-		if regex.MatchString(r.URL.Path) {
-			method.ServeHTTP(w, r)
-		}
+	fmt.Println(r.Method + "" + r.URL.Path)
+	m := h.methods[r.Method]
+	fmt.Println(h.methods)
+	fmt.Println(m.routes)
+	if m == nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
-	/*
-		switch {
-			case regex.MatchString(r.URL.Path):
-				method.ServeHTTP(w, r)
-			default:
-				w.Write([]byte("Not Found"))
-			}
-	*/
+	handler := m.FindHandler(r.URL.Path)
+	if handler == nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	handler.ServeHTTP(w, r)
 }
 
-func generateRegex(route string) *regexp.Regexp {
-	parts := strings.Split(route, "/")
-
-	j := 0
-	params := make(map[int]string)
-	for i, part := range parts {
-		if strings.HasPrefix(part, ":") {
-			expr := "([^/]+)"
-
-			//a user may choose to override the default expression
-			// similar to expressjs: ‘/user/:id([0-9]+)’
-
-			if index := strings.Index(part, "("); index != -1 {
-				expr = part[index:]
-				part = part[:index]
-			}
-			params[j] = part
-			parts[i] = expr
-			j++
-		}
+func (h *Handler) Get(s string, next http.HandlerFunc) {
+	method := "GET"
+	route := h.route + "" + s
+	m := h.methods[method]
+	if m == nil {
+		m = NewMethod()
 	}
+	m.Add(route, next)
+	h.methods[method] = m
+}
 
-	//recreate the url uri, with parameters replaced
-	//by regular expressions. Then compile the regex.
-
-	route = strings.Join(parts, "/")
-	regex, regexErr := regexp.Compile(route)
-	if regexErr != nil {
-
-		//TODO add error handling here to avoid panic
-		panic(regexErr)
+func (h *Handler) Put(s string, next http.HandlerFunc) {
+	method := "PUT"
+	route := h.route + "" + s
+	m := h.methods[method]
+	if m == nil {
+		m = NewMethod()
 	}
-	return regex
+	m.Add(route, next)
+	h.methods[method] = m
+}
+
+func (h *Handler) Post(s string, next http.HandlerFunc) {
+	method := "POST"
+	route := h.route + "" + s
+	m := h.methods[method]
+	if m == nil {
+		m = NewMethod()
+	}
+	m.Add(route, next)
+	h.methods[method] = m
 }

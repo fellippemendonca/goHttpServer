@@ -9,22 +9,33 @@ import (
 
 func InitUsers(p *router.Path) {
 	fmt.Println("[OK] -- INITIALIZING USERS CONTROLLER")
-	getUsers(p)
-	getUserById(p)
+	h := p.Handler()
+	usersGet(h)
+	usersGetByID(h)
+	usersPut(h)
+	usersPost(h)
 }
 
-func getUsers(p *router.Path) {
-	path := p.Add("/")
-	path.Get(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(p.GetUri())
-		fmt.Println(p.GetParams())
-		fmt.Fprintln(w, "Get Users")
+func usersGet(h *router.Handler) {
+	h.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Get users"))
 	})
 }
 
-func getUserById(p *router.Path) {
-	path := p.Add("/:id")
-	path.Get(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Get Users By ID")
+func usersGetByID(h *router.Handler) {
+	h.Get("/:id", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Get users by ID"))
+	})
+}
+
+func usersPost(h *router.Handler) {
+	h.Post("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Post users"))
+	})
+}
+
+func usersPut(h *router.Handler) {
+	h.Put("/:id", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Put users by ID"))
 	})
 }

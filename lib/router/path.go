@@ -1,8 +1,8 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
-	"regexp"
 )
 
 // Path struct
@@ -30,9 +30,9 @@ func (p *Path) resolveRoute() string {
 
 // Handler generator
 func (p *Path) Handler() *Handler {
-	h := &Handler{}
+	h := NewHandler()
 	h.route = p.resolveRoute()
-	h.methods = make(map[*regexp.Regexp]http.Handler)
 	p.mux.Handle(h.route+"/", h)
+	fmt.Println(h.route + "/")
 	return h
 }
