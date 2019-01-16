@@ -11,9 +11,8 @@ type Router struct {
 
 // Add a new path to the router
 func (r *Router) Add(u string) *Path {
-	path := &Path{}
+	path := NewPath()
 	path.uri = u
-	path.head = nil
 	path.mux = r.mux
 	return path
 }

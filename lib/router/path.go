@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+func NewPath() *Path {
+	p := &Path{}
+	p.head = nil
+	return p
+}
+
 // Path struct
 type Path struct {
 	uri  string
