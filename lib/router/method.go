@@ -2,19 +2,20 @@ package router
 
 import (
 	"fmt"
-	"github.com/fellippemendonca/goHttpServer/lib"
 	"net/http"
 	"regexp"
-)
 
-type Method struct {
-	routes map[*regexp.Regexp]http.Handler
-}
+	"github.com/fellippemendonca/goHttpServer/lib"
+)
 
 func NewMethod() *Method {
 	m := &Method{}
 	m.routes = make(map[*regexp.Regexp]http.Handler)
 	return m
+}
+
+type Method struct {
+	routes map[*regexp.Regexp]http.Handler
 }
 
 func (m *Method) Add(route string, next http.HandlerFunc) {

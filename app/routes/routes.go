@@ -11,8 +11,8 @@ import (
 // Router Initializer
 func Init() *http.ServeMux {
 	fmt.Println("[OK] -- INITIALIZING ROUTES")
-	r := router.Init()
-	rootPath := r.Add("/")
+	r := router.NewRouter()
+	rootPath := r.NewPath("/")
 	apiPath := rootPath.Add("api")
 	//middleware.Init(rootPath)
 	api.Init(apiPath)

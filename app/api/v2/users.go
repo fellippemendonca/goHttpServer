@@ -9,7 +9,7 @@ import (
 
 func InitUsers(p *router.Path) {
 	fmt.Println("[OK] -- INITIALIZING USERS CONTROLLER")
-	h := p.Handler()
+	h := p.NewHandler()
 	usersGet(h)
 	usersGetByID(h)
 	usersPut(h)
